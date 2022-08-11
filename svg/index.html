@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title></title>
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="">
+		
+		<style>
+			svg {
+				border: 1px solid #666;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<!--[if lt IE 7]>
+			<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+		<![endif]-->
+		
+		<svg></svg>
+		
+		<!-- D3 -->
+		<script src="https://d3js.org/d3.v7.min.js"></script>
+		<script>
+			// init vars
+			var _width = 1200
+			var _height = 600
+			var _svg = d3.select("svg")
+			
+			// set canvas
+			_svg.attr("width", _width).attr("height", _height)
+			
+			// add things
+			function addObj(id, fillColor, r, x, y) {
+				// create new
+				var newObj = _svg
+					.append("circle")
+					.attr("id", id)
+					.style("fill", fillColor)
+					.attr("r", r)
+					.attr("cx", x)
+					.attr("cy", y)
+				return newObj
+			}
+			function addAnimatedObj(id, fillColor, r, xstart, xend, ystart, yend) {
+				// create keys
+				const xmid = Math.floor((xend - xstart) / 2) + xstart
+				const ymid = Math.floor((yend - ystart) / 2) + ystart
+				const keyDuration = 1000
+				
+				// create new
+				var newObj = addObj(id, fillColor, r, xmid, ystart)
+					
+				// animate
+				animate();
+				function animate() {
+					newObj
+						.attr('cx', xmid)
+						.attr('cy', ystart)
+						
+						.transition()
+						.duration(keyDuration)
+						.attr('cx', xend)
+						.attr('cy', ymid)
+						
+						.transition()
+						.duration(keyDuration)
+						.attr('cx', xmid)
+						.attr('cy', yend)
+						
+						.transition()
+						.duration(keyDuration)
+						.attr('cx', xstart)
+						.attr('cy', ymid)
+						
+						.transition()
+						.duration(keyDuration)
+						.attr('cx', xmid)
+						.attr('cy', ystart)
+					
+						.on("end", animate);  // when the transition finishes start again
+				};
+					
+				return newObj
+			}
+				
+			// add center sun
+			const sun1r = 50
+			const sun1x = Math.floor(_width / 2)
+			const sun1y = Math.floor(_height / 2)
+			var sun1 = addObj("sun1", "yellow", sun1r, sun1x, sun1y)
+				
+			// add second sun
+			const sun2r = 10
+			const sun2xstart = sun1x - sun1r - 10 - sun2r
+			const sun2xend = sun1x + sun1r + 10 + sun2r
+			const sun2ystart = sun1y - sun1r - 10 - sun2r
+			const sun2yend = sun1y + sun1r + 10 + sun2r
+			var sun2 = addAnimatedObj("sun2", "orange", sun2r, sun2xstart, sun2xend, sun2ystart, sun2yend)
+			
+			// add planet
+			// const planetr = 10
+			// const planetxstart = sun1x
+			// const planetystart = sun1y - sun1r - 10 - (2 * sun2r) - 100 - planetr
+			// var planet = addAnimatedObj("planet", "blue", planetr, planetx, planety)
+			
+			// // add moon
+			// const moonr = 5
+			// const moonxstart = sun1x
+			// const moonystart = planety - planetr - 5 - moonr
+			// var moon = addAnimatedObj("moon", "grey", moonr, moonx, moony)
+			
+				
+		</script>
+		
+	</body>
+</html>
