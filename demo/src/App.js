@@ -10,9 +10,9 @@ function App() {
 		<Router>
 			<Navbar />
 			<Routes>
-				<Route path="/two" element={<ParticleSandbox />} />
 				<Route path="/planets" element={<Planets />} />
 				<Route path="/spiral" element={<Spiral />} />
+				<Route path="/two" element={<ParticleSandbox />} />
 			</Routes>
 		</Router>
 	);

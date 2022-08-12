@@ -6,14 +6,14 @@ const Navbar = () => {
 		<>
 			<Nav>
 				<NavMenu>
-					<NavLink to="/two" activeStyle>
-						Particle Sandbox
-					</NavLink>
 					<NavLink to="/planets" activeStyle>
 						Planets
 					</NavLink>
 					<NavLink to="/spiral" activeStyle>
 						Spiral
+					</NavLink>
+					<NavLink to="/two" activeStyle>
+						Particle Sandbox
 					</NavLink>
 				</NavMenu>
 			</Nav>
