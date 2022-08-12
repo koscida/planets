@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import * as d3 from "d3";
 
-const system = {
+const system1 = {
 	primaryObject: {
 		name: "Sun",
 		radius: 50,
@@ -33,10 +33,75 @@ const system = {
 		},
 	],
 	boundaries: {
-		circle: [],
-		square: [],
+		circles: [],
+		squares: [],
 	},
 };
+const system2 = {
+	primaryObject: {
+		name: "Sun",
+		radius: 100,
+		color: "yellow",
+	},
+	secondaryObjects: [
+		{
+			name: "Planet 1",
+			radius: 10,
+			distance: 100,
+			rotations: 137,
+			color: "green",
+		},
+		{
+			name: "Planet 2",
+			radius: 15,
+			distance: 115,
+			rotations: 350,
+			color: "blue",
+		},
+		{
+			name: "Planet 3",
+			radius: 10,
+			distance: 140,
+			rotations: 400,
+			color: "purple",
+		},
+		{
+			name: "Planet 4",
+			radius: 40,
+			distance: 400,
+			rotations: 548,
+			color: "orange",
+			subObjects: [
+				{
+					name: "Moon 1",
+					radius: 5,
+					distance: 10,
+					rotations: 15,
+					color: "grey",
+				},
+				{
+					name: "Moon 2",
+					radius: 6,
+					distance: 12,
+					rotations: 40,
+					color: "grey",
+				},
+				{
+					name: "Moon 3",
+					radius: 10,
+					distance: 17,
+					rotations: 10,
+					color: "grey",
+				},
+			],
+		},
+	],
+	boundaries: {
+		circles: [],
+		squares: [],
+	},
+};
+const system = system2;
 
 const _width = window.innerWidth;
 const _midX = Math.floor(_width / 2);
@@ -55,15 +120,18 @@ const SecondaryCelestialObject = ({
 	centeringX,
 	centeringY,
 	daysPerSecond,
+	paused,
 }) => {
 	const radiusDistance = centeringObjectRaduis + distance + radius;
 	const [angle, setAngle] = useState(0);
 
 	function tickAnimation() {
-		console.log(daysPerSecond);
-		setAngle(
-			(angle) => (angle + 360 * (1 / rotations) * (daysPerSecond / 60)) % 360
-		);
+		if (!paused) {
+			//console.log(daysPerSecond);
+			setAngle(
+				(angle) => (angle + 360 * (1 / rotations) * (daysPerSecond / 60)) % 360
+			);
+		}
 	}
 
 	// start game loop timer on mount
@@ -79,6 +147,14 @@ const SecondaryCelestialObject = ({
 	return (
 		<>
 			<DrawCelestialObject x={x} y={y} r={radius} fillColor={color} />
+			<circle
+				cx={centeringX}
+				cy={centeringY}
+				r={radiusDistance}
+				stroke={color}
+				stroke-width="3"
+				fillOpacity="0"
+			/>
 			{subObjects &&
 				subObjects.map((subObject) => (
 					<SecondaryCelestialObject
@@ -100,6 +176,10 @@ const DrawCelestialObject = ({ x, y, r, fillColor }) => {
 
 export default function App() {
 	const [daysPerSecond, setDaysPerSecond] = useState(50);
+	const [paused, setPaused] = useState(false);
+
+	const handlePause = () => setPaused((pause) => !pause);
+
 	return (
 		<div className="App">
 			<h1>Planets</h1>
@@ -116,6 +196,9 @@ export default function App() {
 					}}
 				/>
 			</div>
+			<div>
+				<button onClick={handlePause}>{paused ? "Play" : "Pause"}</button>
+			</div>
 			<svg width={_width} height={_height}>
 				<PrimaryCelestialObject primaryObject={system.primaryObject} />
 				{system.secondaryObjects.map((secondaryObject) => {
@@ -127,6 +210,7 @@ export default function App() {
 							centeringX={_midX}
 							centeringY={_midY}
 							daysPerSecond={daysPerSecond}
+							paused={paused}
 						/>
 					);
 				})}
