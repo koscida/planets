@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import * as d3 from "d3";
+import "./main.css";
 
 const system1 = {
 	primaryObject: {
@@ -108,9 +109,18 @@ const _midX = Math.floor(_width / 2);
 const _height = window.innerHeight;
 const _midY = Math.floor(_height / 2);
 
-const PrimaryCelestialObject = ({ primaryObject: { name, radius, color } }) => {
+const PrimaryCelestialObject = ({
+	primaryObject: { name, radius, color },
+	zoom,
+	scale,
+}) => {
 	return (
-		<DrawCelestialObject x={_midX} y={_midY} r={radius} fillColor={color} />
+		<DrawCelestialObject
+			x={_midX}
+			y={_midY}
+			r={radius * (scale / 10) * (zoom / 100)}
+			fillColor={color}
+		/>
 	);
 };
 
@@ -122,8 +132,12 @@ const SecondaryCelestialObject = ({
 	daysPerSecond,
 	paused,
 	showOrbit,
+	zoom,
+	scale,
 }) => {
-	const radiusDistance = centeringObjectRaduis + distance + radius;
+	const radiusDistance =
+		(centeringObjectRaduis + distance + radius) * (zoom / 100);
+	const radiusScaled = radius * (scale / 10) * (zoom / 100);
 	const [angle, setAngle] = useState(0);
 
 	function tickAnimation() {
@@ -147,14 +161,14 @@ const SecondaryCelestialObject = ({
 
 	return (
 		<>
-			<DrawCelestialObject x={x} y={y} r={radius} fillColor={color} />
+			<DrawCelestialObject x={x} y={y} r={radiusScaled} fillColor={color} />
 			{showOrbit && (
 				<circle
 					cx={centeringX}
 					cy={centeringY}
 					r={radiusDistance}
 					stroke={color}
-					stroke-width="2"
+					stroke-width={radiusScaled / 10}
 					fillOpacity="0"
 				/>
 			)}
@@ -163,11 +177,13 @@ const SecondaryCelestialObject = ({
 					<SecondaryCelestialObject
 						key={subObject.name}
 						secondaryObject={subObject}
-						centeringObjectRaduis={radius}
+						centeringObjectRaduis={radiusScaled}
 						centeringX={x}
 						centeringY={y}
 						daysPerSecond={daysPerSecond}
 						showOrbit={showOrbit}
+						zoom={zoom}
+						scale={scale}
 					/>
 				))}
 		</>
@@ -182,12 +198,60 @@ export default function App() {
 	const [daysPerSecond, setDaysPerSecond] = useState(50);
 	const [paused, setPaused] = useState(false);
 	const [showOrbit, setShowOrbit] = useState(true);
+	const [zoom, setZoom] = useState(100);
+	const [scale, setScale] = useState(7);
 
 	const handleCheckClick = (setFunc) => setFunc((x) => !x);
 
 	return (
 		<div className="App">
 			<h1>Planets</h1>
+			<div>
+				<label>Zoom: </label>
+				<span>{zoom}</span>
+				<input
+					type="button"
+					value="-"
+					onClick={(e) => setZoom((x) => (x > 1 ? x - 1 : x))}
+				/>
+				<input
+					type="range"
+					min="1"
+					max="200"
+					value={zoom}
+					onChange={(e) => {
+						setZoom(e.target.value);
+					}}
+				/>
+				<input
+					type="button"
+					value="+"
+					onClick={(e) => setZoom((x) => (x < 200 ? x + 1 : x))}
+				/>
+			</div>
+			<div>
+				<label>Scale: </label>
+				<span>{scale}</span>
+				<input
+					type="button"
+					value="-"
+					onClick={(e) => setScale((x) => (x > 1 ? x - 1 : x))}
+				/>
+				<input
+					type="range"
+					min="1"
+					max="10"
+					value={scale}
+					onChange={(e) => {
+						setScale(e.target.value);
+					}}
+				/>
+				<input
+					type="button"
+					value="+"
+					onClick={(e) => setScale((x) => (x < 10 ? x + 1 : x))}
+				/>
+			</div>
 			<div>
 				<label>Days Per Second</label>
 				<span>{daysPerSecond}</span>
@@ -216,7 +280,11 @@ export default function App() {
 				<label htmlFor="showOrbit">Show Orbit</label>
 			</div>
 			<svg width={_width} height={_height}>
-				<PrimaryCelestialObject primaryObject={system.primaryObject} />
+				<PrimaryCelestialObject
+					primaryObject={system.primaryObject}
+					zoom={zoom}
+					scale={scale}
+				/>
 				{system.secondaryObjects.map((secondaryObject) => {
 					return (
 						<SecondaryCelestialObject
@@ -228,6 +296,8 @@ export default function App() {
 							daysPerSecond={daysPerSecond}
 							paused={paused}
 							showOrbit={showOrbit}
+							zoom={zoom}
+							scale={scale}
 						/>
 					);
 				})}
