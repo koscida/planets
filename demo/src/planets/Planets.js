@@ -82,7 +82,7 @@ const system2 = {
 				{
 					name: "Moon 2",
 					radius: 6,
-					distance: 12,
+					distance: 13,
 					rotations: 40,
 					color: "grey",
 				},
@@ -121,6 +121,7 @@ const SecondaryCelestialObject = ({
 	centeringY,
 	daysPerSecond,
 	paused,
+	showOrbit,
 }) => {
 	const radiusDistance = centeringObjectRaduis + distance + radius;
 	const [angle, setAngle] = useState(0);
@@ -147,14 +148,16 @@ const SecondaryCelestialObject = ({
 	return (
 		<>
 			<DrawCelestialObject x={x} y={y} r={radius} fillColor={color} />
-			<circle
-				cx={centeringX}
-				cy={centeringY}
-				r={radiusDistance}
-				stroke={color}
-				stroke-width="3"
-				fillOpacity="0"
-			/>
+			{showOrbit && (
+				<circle
+					cx={centeringX}
+					cy={centeringY}
+					r={radiusDistance}
+					stroke={color}
+					stroke-width="2"
+					fillOpacity="0"
+				/>
+			)}
 			{subObjects &&
 				subObjects.map((subObject) => (
 					<SecondaryCelestialObject
@@ -164,6 +167,7 @@ const SecondaryCelestialObject = ({
 						centeringX={x}
 						centeringY={y}
 						daysPerSecond={daysPerSecond}
+						showOrbit={showOrbit}
 					/>
 				))}
 		</>
@@ -177,8 +181,9 @@ const DrawCelestialObject = ({ x, y, r, fillColor }) => {
 export default function App() {
 	const [daysPerSecond, setDaysPerSecond] = useState(50);
 	const [paused, setPaused] = useState(false);
+	const [showOrbit, setShowOrbit] = useState(true);
 
-	const handlePause = () => setPaused((pause) => !pause);
+	const handleCheckClick = (setFunc) => setFunc((x) => !x);
 
 	return (
 		<div className="App">
@@ -197,7 +202,18 @@ export default function App() {
 				/>
 			</div>
 			<div>
-				<button onClick={handlePause}>{paused ? "Play" : "Pause"}</button>
+				<button onClick={(e) => handleCheckClick(setPaused)}>
+					{paused ? "Play" : "Pause"}
+				</button>
+			</div>
+			<div>
+				<input
+					type="checkbox"
+					id="showOrbit"
+					checked={showOrbit}
+					onClick={(e) => handleCheckClick(setShowOrbit)}
+				/>
+				<label htmlFor="showOrbit">Show Orbit</label>
 			</div>
 			<svg width={_width} height={_height}>
 				<PrimaryCelestialObject primaryObject={system.primaryObject} />
@@ -211,6 +227,7 @@ export default function App() {
 							centeringY={_midY}
 							daysPerSecond={daysPerSecond}
 							paused={paused}
+							showOrbit={showOrbit}
 						/>
 					);
 				})}
