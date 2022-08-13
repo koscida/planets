@@ -8,7 +8,7 @@ import Spiral from "./spiral/SpiralApp";
 function App() {
 	return (
 		<Router>
-			<Navbar />
+			{/* <Navbar /> */}
 			<Routes>
 				<Route path="/planets" element={<Planets />} />
 				<Route path="/spiral" element={<Spiral />} />

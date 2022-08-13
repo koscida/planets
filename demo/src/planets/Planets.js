@@ -1,50 +1,237 @@
 import React, { useState, useEffect } from "react";
 import * as d3 from "d3";
+import { Grid, TextField } from "@mui/material";
+import InputSlider from "./components/InputSlider";
 import "./main.css";
 
-const system1 = {
-	primaryObject: {
-		name: "Sun",
-		radius: 50,
-		color: "yellow",
-	},
-	secondaryObjects: [
+const dwarfSystem = {
+	celestialObjects: [
 		{
-			name: "Sun 2",
-			radius: 10,
-			distance: 10,
-			rotations: 137,
-			color: "orange",
+			name: "Sun 1",
+			radius: 50,
+			distanceX: -30,
+			distanceY: -30,
+			rotations: 1112,
+			offSet: 0,
+			color: "yellow",
+			subObjects: [
+				{
+					name: "Sun 2",
+					radius: 10,
+					distanceX: 50 + 5,
+					distanceY: 50 + 5,
+					rotations: 1112,
+					offSet: 556,
+					color: "orange",
+				},
+			],
 		},
 		{
 			name: "Planet",
 			radius: 10,
-			distance: 200,
-			rotations: 548,
+			distanceX: 200,
+			distanceY: 200,
+			rotations: 556,
+			offSet: 278,
 			color: "blue",
 			subObjects: [
 				{
 					name: "Moon",
 					radius: 5,
-					distance: 10,
-					rotations: 36,
+					distanceX: 10,
+					distanceY: 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+			],
+		},
+		{
+			name: "Planet 1",
+			radius: 20,
+			distanceX: 400,
+			distanceY: 400,
+			rotations: 2000,
+			offSet: 278,
+			color: "blue",
+			subObjects: [
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 50 + 10,
+					distanceY: 50 + 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 50 + 10,
+					distanceY: 50 + 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 50 + 10,
+					distanceY: 50 + 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 50 + 10,
+					distanceY: 50 + 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 50 + 10,
+					distanceY: 50 + 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 50 + 10,
+					distanceY: 50 + 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 50 + 10,
+					distanceY: 50 + 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 50 + 10,
+					distanceY: 50 + 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 50 + 10,
+					distanceY: 50 + 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+			],
+		},
+
+		{
+			name: "Planet 2",
+			radius: 25,
+			distanceX: 500,
+			distanceY: 500,
+			rotations: 5000,
+			offSet: 555,
+			color: "blue",
+			subObjects: [
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 10,
+					distanceY: 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 10,
+					distanceY: 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 10,
+					distanceY: 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 50 + 10,
+					distanceY: 50 + 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 50 + 10,
+					distanceY: 50 + 10,
+					rotations: 139,
+					offSet: 0,
+					color: "grey",
+				},
+			],
+		},
+		{
+			name: "Planet 3",
+			radius: 30,
+			distanceX: 600,
+			distanceY: 600,
+			rotations: 3333,
+			offSet: 333,
+			color: "blue",
+			subObjects: [
+				{
+					name: "Moon",
+					radius: 5,
+					distanceX: 50 + 10,
+					distanceY: 50 + 10,
+					rotations: 139,
+					offSet: 0,
 					color: "grey",
 				},
 			],
 		},
 	],
 	boundaries: {
-		circles: [],
+		circles: [
+			{ strokeColor: "black", strokeWidth: 1, radiusX: 150, radiusY: 150 },
+		],
 		squares: [],
 	},
 };
-const system2 = {
-	primaryObject: {
-		name: "Sun",
-		radius: 100,
-		color: "yellow",
-	},
-	secondaryObjects: [
+const earthSystem = {
+	celestialObjects: [
+		{
+			name: "Sun",
+			radius: 100,
+			distance: 0,
+			rotations: 0,
+			color: "yellow",
+		},
 		{
 			name: "Planet 1",
 			radius: 10,
@@ -102,31 +289,23 @@ const system2 = {
 		squares: [],
 	},
 };
-const system = system2;
 
-const _width = window.innerWidth;
+const _width = window.innerWidth * 0.8;
 const _midX = Math.floor(_width / 2);
-const _height = window.innerHeight;
+const _height = window.innerHeight - 20;
+// console.log("_height", _height);
 const _midY = Math.floor(_height / 2);
 
-const PrimaryCelestialObject = ({
-	primaryObject: { name, radius, color },
-	zoom,
-	scale,
-}) => {
-	return (
-		<DrawCelestialObject
-			x={_midX}
-			y={_midY}
-			r={radius * (scale / 10) * (zoom / 100)}
-			fillColor={color}
-		/>
-	);
-};
-
-const SecondaryCelestialObject = ({
-	secondaryObject: { name, radius, distance, rotations, color, subObjects },
-	centeringObjectRaduis,
+const CelestialObject = ({
+	celestialObject: {
+		radius,
+		distanceX,
+		distanceY,
+		rotations,
+		offSet,
+		color,
+		subObjects,
+	},
 	centeringX,
 	centeringY,
 	daysPerSecond,
@@ -135,10 +314,10 @@ const SecondaryCelestialObject = ({
 	zoom,
 	scale,
 }) => {
-	const radiusDistance =
-		(centeringObjectRaduis + distance + radius) * (zoom / 100);
+	const radiusDistanceX = (distanceX + radius) * (zoom / 100);
+	const radiusDistanceY = (distanceY + radius) * (zoom / 100);
 	const radiusScaled = radius * (scale / 10) * (zoom / 100);
-	const [angle, setAngle] = useState(0);
+	const [angle, setAngle] = useState(offSet);
 
 	function tickAnimation() {
 		if (!paused) {
@@ -156,28 +335,28 @@ const SecondaryCelestialObject = ({
 		return () => t.stop();
 	}, []);
 
-	const x = centeringX - Math.cos((angle * Math.PI) / 180) * radiusDistance;
-	const y = centeringY - Math.sin((angle * Math.PI) / 180) * radiusDistance;
+	const x = centeringX - Math.cos((angle * Math.PI) / 180) * radiusDistanceX;
+	const y = centeringY - Math.sin((angle * Math.PI) / 180) * radiusDistanceY;
 
 	return (
 		<>
-			<DrawCelestialObject x={x} y={y} r={radiusScaled} fillColor={color} />
+			<circle cx={x} cy={y} r={radiusScaled} fill={color} />
 			{showOrbit && (
-				<circle
+				<ellipse
 					cx={centeringX}
 					cy={centeringY}
-					r={radiusDistance}
+					rx={radiusDistanceX}
+					ry={radiusDistanceY}
 					stroke={color}
-					stroke-width={radiusScaled / 10}
+					strokeWidth={Math.min(Math.max(radiusScaled / 10, 0.4), 3)}
 					fillOpacity="0"
 				/>
 			)}
 			{subObjects &&
 				subObjects.map((subObject) => (
-					<SecondaryCelestialObject
+					<CelestialObject
 						key={subObject.name}
-						secondaryObject={subObject}
-						centeringObjectRaduis={radiusScaled}
+						celestialObject={subObject}
 						centeringX={x}
 						centeringY={y}
 						daysPerSecond={daysPerSecond}
@@ -190,118 +369,191 @@ const SecondaryCelestialObject = ({
 	);
 };
 
-const DrawCelestialObject = ({ x, y, r, fillColor }) => {
-	return <circle cx={x} cy={y} r={r} fill={fillColor} />;
+const CircularBoundary = ({
+	circleBoundary: { strokeColor, strokeWidth, radiusX, radiusY },
+	centeringX,
+	centeringY,
+	zoom,
+	scale,
+}) => {
+	const radiusScaledX = radiusX * (scale / 10) * (zoom / 100);
+	const radiusScaledY = radiusY * (scale / 10) * (zoom / 100);
+	return (
+		<ellipse
+			cx={centeringX}
+			cy={centeringY}
+			rx={radiusScaledX}
+			ry={radiusScaledY}
+			stroke={strokeColor}
+			strokeWidth={strokeWidth}
+			fillOpacity="0"
+		/>
+	);
 };
 
 export default function App() {
+	const [zoom, setZoom] = useState(1);
+	const [scale, setScale] = useState(7);
+
 	const [daysPerSecond, setDaysPerSecond] = useState(50);
 	const [paused, setPaused] = useState(false);
 	const [showOrbit, setShowOrbit] = useState(true);
-	const [zoom, setZoom] = useState(100);
-	const [scale, setScale] = useState(7);
+
+	const [system, setSystem] = useState(dwarfSystem);
 
 	const handleCheckClick = (setFunc) => setFunc((x) => !x);
+	const handleScroll = (e) => {
+		const porportion = Math.floor(
+			(e.target.scrollingElement.scrollTop / (_height - 20)) * 100
+		);
+		setZoom(porportion);
+	};
+	useEffect(() => {
+		function watchScroll() {
+			window.addEventListener("scroll", handleScroll);
+		}
+		watchScroll();
+
+		return () => {
+			window.removeEventListener("scroll", handleScroll);
+		};
+	}, []);
 
 	return (
 		<div className="App">
-			<h1>Planets</h1>
-			<div>
-				<label>Zoom: </label>
-				<span>{zoom}</span>
-				<input
-					type="button"
-					value="-"
-					onClick={(e) => setZoom((x) => (x > 1 ? x - 1 : x))}
-				/>
-				<input
-					type="range"
-					min="1"
-					max="200"
-					value={zoom}
-					onChange={(e) => {
-						setZoom(e.target.value);
-					}}
-				/>
-				<input
-					type="button"
-					value="+"
-					onClick={(e) => setZoom((x) => (x < 200 ? x + 1 : x))}
-				/>
-			</div>
-			<div>
-				<label>Scale: </label>
-				<span>{scale}</span>
-				<input
-					type="button"
-					value="-"
-					onClick={(e) => setScale((x) => (x > 1 ? x - 1 : x))}
-				/>
-				<input
-					type="range"
-					min="1"
-					max="10"
-					value={scale}
-					onChange={(e) => {
-						setScale(e.target.value);
-					}}
-				/>
-				<input
-					type="button"
-					value="+"
-					onClick={(e) => setScale((x) => (x < 10 ? x + 1 : x))}
-				/>
-			</div>
-			<div>
-				<label>Days Per Second</label>
-				<span>{daysPerSecond}</span>
-				<input
-					type="range"
-					min="1"
-					max="100"
-					value={daysPerSecond}
-					onChange={(e) => {
-						setDaysPerSecond(e.target.value);
-					}}
-				/>
-			</div>
-			<div>
-				<button onClick={(e) => handleCheckClick(setPaused)}>
-					{paused ? "Play" : "Pause"}
-				</button>
-			</div>
-			<div>
-				<input
-					type="checkbox"
-					id="showOrbit"
-					checked={showOrbit}
-					onClick={(e) => handleCheckClick(setShowOrbit)}
-				/>
-				<label htmlFor="showOrbit">Show Orbit</label>
-			</div>
-			<svg width={_width} height={_height}>
-				<PrimaryCelestialObject
-					primaryObject={system.primaryObject}
-					zoom={zoom}
-					scale={scale}
-				/>
-				{system.secondaryObjects.map((secondaryObject) => {
-					return (
-						<SecondaryCelestialObject
-							key={secondaryObject.name}
-							secondaryObject={secondaryObject}
-							centeringObjectRaduis={system.primaryObject.radius}
-							centeringX={_midX}
-							centeringY={_midY}
-							daysPerSecond={daysPerSecond}
-							paused={paused}
-							showOrbit={showOrbit}
-							zoom={zoom}
-							scale={scale}
-						/>
-					);
-				})}
-			</svg>
+			<Grid container style={{ height: _height }}>
+				<Grid item md={2}>
+					<div
+						style={{
+							height: _height,
+							width: "calc(2 * 100% / 12)",
+							position: "fixed",
+						}}
+					>
+						<h1>Planets</h1>
+						<div>
+							<InputSlider
+								label={"Zoom"}
+								value={zoom}
+								setValue={setZoom}
+								min={1}
+								max={100}
+								defaultValue={1}
+							/>
+						</div>
+						<div>
+							<InputSlider
+								label={"Scale"}
+								value={scale}
+								setValue={setScale}
+								min={1}
+								max={10}
+								defaultValue={7}
+							/>
+						</div>
+						<hr />
+						<div>
+							<label>Days Per Second</label>
+							<span>{daysPerSecond}</span>
+							<input
+								type="range"
+								min="1"
+								max="100"
+								value={daysPerSecond}
+								onChange={(e) => {
+									setDaysPerSecond(e.target.value);
+								}}
+							/>
+						</div>
+						<div>
+							<button onClick={(e) => handleCheckClick(setPaused)}>
+								{paused ? "Play" : "Pause"}
+							</button>
+						</div>
+						<div>
+							<input
+								type="checkbox"
+								id="showOrbit"
+								checked={showOrbit}
+								onChange={(e) => handleCheckClick(setShowOrbit)}
+							/>
+							<label htmlFor="showOrbit">Show Orbit</label>
+						</div>
+						<hr />
+						<div>
+							{/* <p>Primary Sun</p>
+							<TextField
+								id={`sun-radius`}
+								label={"Radius"}
+								variant="filled"
+								value={system.primaryObject.radius}
+								onChange={({ target: { value } }) => {
+									setSystem((oldSystem) => {
+										oldSystem.primaryObject.radius = +value;
+										return oldSystem;
+									});
+								}}
+							/>
+							<input
+								type="number"
+								value={system.primaryObject.radius}
+								onChange={({ target: { value } }) => {
+									setSystem((oldSystem) => {
+										oldSystem.primaryObject.radius = +value;
+										return oldSystem;
+									});
+								}}
+							/>
+							<TextField
+								id={`sun-color`}
+								label={"Color"}
+								variant="filled"
+								value={system.primaryObject.color}
+								onChange={({ target: { value } }) =>
+									setSystem((oldSystem) => {
+										oldSystem.primaryObject.color = value;
+										return oldSystem;
+									})
+								}
+							/> */}
+						</div>
+					</div>
+				</Grid>
+				<Grid item md={10}>
+					<div style={{ height: _height * 2, position: "relative" }}>
+						<div style={{ position: "fixed" }}>
+							<svg width={_width} height={_height}>
+								{system.celestialObjects.map((celestialObject) => {
+									return (
+										<CelestialObject
+											key={celestialObject.name}
+											celestialObject={celestialObject}
+											centeringX={_midX}
+											centeringY={_midY}
+											daysPerSecond={daysPerSecond}
+											paused={paused}
+											showOrbit={showOrbit}
+											zoom={zoom}
+											scale={scale}
+										/>
+									);
+								})}
+								{system.boundaries.circles.length > 0 &&
+									system.boundaries.circles.map((cir, i) => (
+										<CircularBoundary
+											key={i}
+											circleBoundary={cir}
+											centeringX={_midX}
+											centeringY={_midY}
+											zoom={zoom}
+											scale={scale}
+										/>
+									))}
+							</svg>
+						</div>
+					</div>
+				</Grid>
+			</Grid>
 		</div>
 	);
 }
