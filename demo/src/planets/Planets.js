@@ -9,22 +9,20 @@ const dwarfSystem = {
 		{
 			name: "Sun 1",
 			radius: 50,
-			distanceX: -30,
-			distanceY: -30,
+			distanceX: -40,
+			distanceY: -40,
 			rotations: 1112,
 			offSet: 0,
 			color: "yellow",
-			subObjects: [
-				{
-					name: "Sun 2",
-					radius: 10,
-					distanceX: 50 + 5,
-					distanceY: 50 + 5,
-					rotations: 1112,
-					offSet: 556,
-					color: "orange",
-				},
-			],
+		},
+		{
+			name: "Sun 2",
+			radius: 10,
+			distanceX: 50 + 5,
+			distanceY: 50 + 5,
+			rotations: 1112,
+			offSet: 556,
+			color: "orange",
 		},
 		{
 			name: "Planet",
@@ -353,9 +351,9 @@ const CelestialObject = ({
 				/>
 			)}
 			{subObjects &&
-				subObjects.map((subObject) => (
+				subObjects.map((subObject, i) => (
 					<CelestialObject
-						key={subObject.name}
+						key={i}
 						celestialObject={subObject}
 						centeringX={x}
 						centeringY={y}
@@ -399,7 +397,12 @@ export default function App() {
 	const [paused, setPaused] = useState(false);
 	const [showOrbit, setShowOrbit] = useState(true);
 
-	const [system, setSystem] = useState(dwarfSystem);
+	const [systemPlanets, setSystemPlanets] = useState(
+		dwarfSystem.celestialObjects
+	);
+	const [systemBoundaries, setSystemBoundaries] = useState(
+		dwarfSystem.boundaries
+	);
 
 	const handleCheckClick = (setFunc) => setFunc((x) => !x);
 	const handleScroll = (e) => {
@@ -481,41 +484,45 @@ export default function App() {
 						</div>
 						<hr />
 						<div>
-							{/* <p>Primary Sun</p>
-							<TextField
-								id={`sun-radius`}
-								label={"Radius"}
-								variant="filled"
-								value={system.primaryObject.radius}
-								onChange={({ target: { value } }) => {
-									setSystem((oldSystem) => {
-										oldSystem.primaryObject.radius = +value;
-										return oldSystem;
-									});
-								}}
-							/>
-							<input
-								type="number"
-								value={system.primaryObject.radius}
-								onChange={({ target: { value } }) => {
-									setSystem((oldSystem) => {
-										oldSystem.primaryObject.radius = +value;
-										return oldSystem;
-									});
-								}}
-							/>
-							<TextField
-								id={`sun-color`}
-								label={"Color"}
-								variant="filled"
-								value={system.primaryObject.color}
-								onChange={({ target: { value } }) =>
-									setSystem((oldSystem) => {
-										oldSystem.primaryObject.color = value;
-										return oldSystem;
-									})
-								}
-							/> */}
+							{systemPlanets.map((celestialObject, i) => (
+								<div key={i}>
+									<p>{celestialObject.name}</p>
+									<TextField
+										id={`sun-radius`}
+										label={"Radius"}
+										variant="filled"
+										value={celestialObject.radius}
+										onChange={({ target: { value } }) => {
+											setSystemPlanets((oldSystem) => {
+												oldSystem[i].radius = +value;
+												return oldSystem;
+											});
+										}}
+									/>
+									<input
+										type="number"
+										value={celestialObject.radius}
+										onChange={({ target: { value } }) => {
+											setSystemPlanets((oldSystem) => {
+												oldSystem[i].radius = +value;
+												return oldSystem;
+											});
+										}}
+									/>
+									<TextField
+										id={`sun-color`}
+										label={"Color"}
+										variant="filled"
+										value={celestialObject.color}
+										onChange={({ target: { value } }) =>
+											setSystemPlanets((oldSystem) => {
+												oldSystem[i].color = value;
+												return oldSystem;
+											})
+										}
+									/>
+								</div>
+							))}
 						</div>
 					</div>
 				</Grid>
@@ -523,10 +530,10 @@ export default function App() {
 					<div style={{ height: _height * 2, position: "relative" }}>
 						<div style={{ position: "fixed" }}>
 							<svg width={_width} height={_height}>
-								{system.celestialObjects.map((celestialObject) => {
+								{systemPlanets.map((celestialObject, i) => {
 									return (
 										<CelestialObject
-											key={celestialObject.name}
+											key={i}
 											celestialObject={celestialObject}
 											centeringX={_midX}
 											centeringY={_midY}
@@ -538,8 +545,8 @@ export default function App() {
 										/>
 									);
 								})}
-								{system.boundaries.circles.length > 0 &&
-									system.boundaries.circles.map((cir, i) => (
+								{systemBoundaries.circles.length > 0 &&
+									systemBoundaries.circles.map((cir, i) => (
 										<CircularBoundary
 											key={i}
 											circleBoundary={cir}
