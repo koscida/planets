@@ -390,7 +390,7 @@ const CircularBoundary = ({
 };
 
 export default function App() {
-	const [zoom, setZoom] = useState(1);
+	const [zoom, setZoom] = useState(50);
 	const [scale, setScale] = useState(7);
 
 	const [daysPerSecond, setDaysPerSecond] = useState(50);
@@ -405,32 +405,33 @@ export default function App() {
 	);
 
 	const handleCheckClick = (setFunc) => setFunc((x) => !x);
-	const handleScroll = (e) => {
-		const porportion = Math.floor(
-			(e.target.scrollingElement.scrollTop / (_height - 20)) * 100
-		);
-		setZoom(porportion);
-	};
-	useEffect(() => {
-		function watchScroll() {
-			window.addEventListener("scroll", handleScroll);
-		}
-		watchScroll();
+	// const handleScroll = (e) => {
+	// 	const porportion = Math.floor(
+	// 		(e.target.scrollingElement.scrollTop / (_height - 20)) * 100
+	// 	);
+	// 	setZoom(porportion);
+	// };
+	// useEffect(() => {
+	// 	function watchScroll() {
+	// 		window.addEventListener("scroll", handleScroll);
+	// 	}
+	// 	watchScroll();
 
-		return () => {
-			window.removeEventListener("scroll", handleScroll);
-		};
-	}, []);
+	// 	return () => {
+	// 		window.removeEventListener("scroll", handleScroll);
+	// 	};
+	// }, []);
 
 	return (
 		<div className="App">
-			<Grid container style={{ height: _height }}>
+			<Grid container>
 				<Grid item md={2}>
 					<div
 						style={{
 							height: _height,
 							width: "calc(2 * 100% / 12)",
 							position: "fixed",
+							overflow: "scroll",
 						}}
 					>
 						<h1>Planets</h1>
@@ -488,7 +489,19 @@ export default function App() {
 								<div key={i}>
 									<p>{celestialObject.name}</p>
 									<TextField
-										id={`sun-radius`}
+										id={`${celestialObject.name}-name`}
+										label={"Name"}
+										variant="filled"
+										value={celestialObject.name}
+										onChange={({ target: { value } }) => {
+											setSystemPlanets((oldSystem) => {
+												oldSystem[i].name = +value;
+												return oldSystem;
+											});
+										}}
+									/>
+									<TextField
+										id={`${celestialObject.name}-radius`}
 										label={"Radius"}
 										variant="filled"
 										value={celestialObject.radius}
@@ -499,24 +512,62 @@ export default function App() {
 											});
 										}}
 									/>
-									<input
-										type="number"
-										value={celestialObject.radius}
+									<TextField
+										id={`${celestialObject.name}-distanceX`}
+										label={"DistanceX"}
+										variant="filled"
+										value={celestialObject.distanceX}
 										onChange={({ target: { value } }) => {
 											setSystemPlanets((oldSystem) => {
-												oldSystem[i].radius = +value;
+												oldSystem[i].distanceX = +value;
 												return oldSystem;
 											});
 										}}
 									/>
 									<TextField
-										id={`sun-color`}
+										id={`${celestialObject.name}-distanceY`}
+										label={"DistanceY"}
+										variant="filled"
+										value={celestialObject.distanceY}
+										onChange={({ target: { value } }) => {
+											setSystemPlanets((oldSystem) => {
+												oldSystem[i].distanceY = +value;
+												return oldSystem;
+											});
+										}}
+									/>
+									<TextField
+										id={`${celestialObject.name}-color`}
 										label={"Color"}
 										variant="filled"
 										value={celestialObject.color}
 										onChange={({ target: { value } }) =>
 											setSystemPlanets((oldSystem) => {
 												oldSystem[i].color = value;
+												return oldSystem;
+											})
+										}
+									/>
+									<TextField
+										id={`${celestialObject.name}-rotations`}
+										label={"Rotations"}
+										variant="filled"
+										value={celestialObject.rotations}
+										onChange={({ target: { value } }) => {
+											setSystemPlanets((oldSystem) => {
+												oldSystem[i].rotations = +value;
+												return oldSystem;
+											});
+										}}
+									/>
+									<TextField
+										id={`${celestialObject.name}-offset`}
+										label={"Offset"}
+										variant="filled"
+										value={celestialObject.offSet}
+										onChange={({ target: { value } }) =>
+											setSystemPlanets((oldSystem) => {
+												oldSystem[i].offSet = value;
 												return oldSystem;
 											})
 										}
