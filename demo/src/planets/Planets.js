@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import * as d3 from "d3";
-import { Grid, TextField } from "@mui/material";
+import {
+	Grid,
+	TextField,
+	Accordion,
+	AccordionDetails,
+	AccordionSummary,
+	Typography,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import InputSlider from "./components/InputSlider";
 import "./main.css";
 
@@ -306,32 +314,19 @@ const CelestialObject = ({
 	},
 	centeringX,
 	centeringY,
-	daysPerSecond,
-	paused,
 	showOrbit,
 	zoom,
 	scale,
+	tick,
 }) => {
 	const radiusDistanceX = (distanceX + radius) * (zoom / 100);
 	const radiusDistanceY = (distanceY + radius) * (zoom / 100);
 	const radiusScaled = radius * (scale / 10) * (zoom / 100);
-	const [angle, setAngle] = useState(offSet);
 
-	function tickAnimation() {
-		if (!paused) {
-			//console.log(daysPerSecond);
-			setAngle(
-				(angle) => (angle + 360 * (1 / rotations) * (daysPerSecond / 60)) % 360
-			);
-		}
-	}
-
-	// start game loop timer on mount
-	useEffect(() => {
-		//const t = d3.timer(tickAnimation);
-		const t = d3.interval(tickAnimation, 1000 * (1 / 60));
-		return () => t.stop();
-	}, []);
+	// (angle + 360 * (1 / rotations) * (daysPerSecond / 60)) % 360
+	//const angle = (360 * (1 / rotations) * ((tick % 60) / 60)) % 360;
+	// const angle = tick % 360
+	const angle = (360 * (tick % (360 * rotations)) * (1 / rotations)) % 360;
 
 	const x = centeringX - Math.cos((angle * Math.PI) / 180) * radiusDistanceX;
 	const y = centeringY - Math.sin((angle * Math.PI) / 180) * radiusDistanceY;
@@ -357,10 +352,10 @@ const CelestialObject = ({
 						celestialObject={subObject}
 						centeringX={x}
 						centeringY={y}
-						daysPerSecond={daysPerSecond}
 						showOrbit={showOrbit}
 						zoom={zoom}
 						scale={scale}
+						tick={tick}
 					/>
 				))}
 		</>
@@ -390,6 +385,7 @@ const CircularBoundary = ({
 };
 
 export default function App() {
+	const [tick, setTick] = useState(0);
 	const [zoom, setZoom] = useState(50);
 	const [scale, setScale] = useState(7);
 
@@ -403,6 +399,7 @@ export default function App() {
 	const [systemBoundaries, setSystemBoundaries] = useState(
 		dwarfSystem.boundaries
 	);
+	const [expanded, setExpanded] = useState();
 
 	const handleCheckClick = (setFunc) => setFunc((x) => !x);
 	// const handleScroll = (e) => {
@@ -421,6 +418,21 @@ export default function App() {
 	// 		window.removeEventListener("scroll", handleScroll);
 	// 	};
 	// }, []);
+	const handleAccordion = (panel) => (event, isExpanded) => {
+		setExpanded(isExpanded ? panel : false);
+	};
+
+	// tick animation
+	function tickAnimation() {
+		if (!paused) setTick((tick) => (tick += 1));
+	}
+
+	// start game loop timer on mount
+	useEffect(() => {
+		//const t = d3.timer(tickAnimation);
+		const t = d3.interval(tickAnimation, 1000 * (1 / 25));
+		return () => t.stop();
+	}, []);
 
 	return (
 		<div className="App">
@@ -457,6 +469,10 @@ export default function App() {
 						</div>
 						<hr />
 						<div>
+							<p>Tick: {tick}</p>
+						</div>
+						<hr />
+						<div>
 							<label>Days Per Second</label>
 							<span>{daysPerSecond}</span>
 							<input
@@ -485,94 +501,106 @@ export default function App() {
 						</div>
 						<hr />
 						<div>
+							Planets
 							{systemPlanets.map((celestialObject, i) => (
-								<div key={i}>
-									<p>{celestialObject.name}</p>
-									<TextField
-										id={`${celestialObject.name}-name`}
-										label={"Name"}
-										variant="filled"
-										value={celestialObject.name}
-										onChange={({ target: { value } }) => {
-											setSystemPlanets((oldSystem) => {
-												oldSystem[i].name = +value;
-												return oldSystem;
-											});
-										}}
-									/>
-									<TextField
-										id={`${celestialObject.name}-radius`}
-										label={"Radius"}
-										variant="filled"
-										value={celestialObject.radius}
-										onChange={({ target: { value } }) => {
-											setSystemPlanets((oldSystem) => {
-												oldSystem[i].radius = +value;
-												return oldSystem;
-											});
-										}}
-									/>
-									<TextField
-										id={`${celestialObject.name}-distanceX`}
-										label={"DistanceX"}
-										variant="filled"
-										value={celestialObject.distanceX}
-										onChange={({ target: { value } }) => {
-											setSystemPlanets((oldSystem) => {
-												oldSystem[i].distanceX = +value;
-												return oldSystem;
-											});
-										}}
-									/>
-									<TextField
-										id={`${celestialObject.name}-distanceY`}
-										label={"DistanceY"}
-										variant="filled"
-										value={celestialObject.distanceY}
-										onChange={({ target: { value } }) => {
-											setSystemPlanets((oldSystem) => {
-												oldSystem[i].distanceY = +value;
-												return oldSystem;
-											});
-										}}
-									/>
-									<TextField
-										id={`${celestialObject.name}-color`}
-										label={"Color"}
-										variant="filled"
-										value={celestialObject.color}
-										onChange={({ target: { value } }) =>
-											setSystemPlanets((oldSystem) => {
-												oldSystem[i].color = value;
-												return oldSystem;
-											})
-										}
-									/>
-									<TextField
-										id={`${celestialObject.name}-rotations`}
-										label={"Rotations"}
-										variant="filled"
-										value={celestialObject.rotations}
-										onChange={({ target: { value } }) => {
-											setSystemPlanets((oldSystem) => {
-												oldSystem[i].rotations = +value;
-												return oldSystem;
-											});
-										}}
-									/>
-									<TextField
-										id={`${celestialObject.name}-offset`}
-										label={"Offset"}
-										variant="filled"
-										value={celestialObject.offSet}
-										onChange={({ target: { value } }) =>
-											setSystemPlanets((oldSystem) => {
-												oldSystem[i].offSet = value;
-												return oldSystem;
-											})
-										}
-									/>
-								</div>
+								<Accordion
+									expanded={expanded === i}
+									onChange={handleAccordion(i)}
+								>
+									<AccordionSummary
+										expandIcon={<ExpandMoreIcon />}
+										aria-controls="panel1bh-content"
+										id="panel1bh-header"
+									>
+										<Typography>{celestialObject.name}</Typography>
+									</AccordionSummary>
+									<AccordionDetails>
+										<TextField
+											id={`${celestialObject.name}-name`}
+											label={"Name"}
+											variant="filled"
+											value={celestialObject.name}
+											onChange={({ target: { value } }) => {
+												setSystemPlanets((oldSystem) => {
+													oldSystem[i].name = +value;
+													return oldSystem;
+												});
+											}}
+										/>
+										<TextField
+											id={`${celestialObject.name}-radius`}
+											label={"Radius"}
+											variant="filled"
+											value={celestialObject.radius}
+											onChange={({ target: { value } }) => {
+												setSystemPlanets((oldSystem) => {
+													oldSystem[i].radius = +value;
+													return oldSystem;
+												});
+											}}
+										/>
+										<TextField
+											id={`${celestialObject.name}-distanceX`}
+											label={"DistanceX"}
+											variant="filled"
+											value={celestialObject.distanceX}
+											onChange={({ target: { value } }) => {
+												setSystemPlanets((oldSystem) => {
+													oldSystem[i].distanceX = +value;
+													return oldSystem;
+												});
+											}}
+										/>
+										<TextField
+											id={`${celestialObject.name}-distanceY`}
+											label={"DistanceY"}
+											variant="filled"
+											value={celestialObject.distanceY}
+											onChange={({ target: { value } }) => {
+												setSystemPlanets((oldSystem) => {
+													oldSystem[i].distanceY = +value;
+													return oldSystem;
+												});
+											}}
+										/>
+										<TextField
+											id={`${celestialObject.name}-color`}
+											label={"Color"}
+											variant="filled"
+											value={celestialObject.color}
+											onChange={({ target: { value } }) =>
+												setSystemPlanets((oldSystem) => {
+													oldSystem[i].color = value;
+													return oldSystem;
+												})
+											}
+										/>
+										<TextField
+											id={`${celestialObject.name}-rotations`}
+											label={"Rotations"}
+											variant="filled"
+											value={celestialObject.rotations}
+											onChange={({ target: { value } }) => {
+												setSystemPlanets((oldSystem) => {
+													oldSystem[i].rotations = +value;
+													return oldSystem;
+												});
+											}}
+										/>
+										<TextField
+											id={`${celestialObject.name}-offset`}
+											label={"Offset"}
+											variant="filled"
+											value={celestialObject.offSet}
+											onChange={({ target: { value } }) =>
+												setSystemPlanets((oldSystem) => {
+													oldSystem[i].offSet = value;
+													return oldSystem;
+												})
+											}
+										/>
+									</AccordionDetails>
+								</Accordion>
 							))}
 						</div>
 					</div>
@@ -593,6 +621,7 @@ export default function App() {
 											showOrbit={showOrbit}
 											zoom={zoom}
 											scale={scale}
+											tick={tick}
 										/>
 									);
 								})}
