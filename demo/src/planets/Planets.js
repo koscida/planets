@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import * as d3 from "d3";
 import {
+	Box,
 	Grid,
 	FormControlLabel,
 	TextField,
@@ -368,6 +369,132 @@ const CelestialObject = ({
 	);
 };
 
+const CelestialObjectInputs = ({
+	name,
+	objects,
+	setSystemPlanets,
+	setPaused,
+}) => {
+	const [expanded, setExpanded] = useState();
+	const setCelestialObject = (newCelestialObject, i) => {
+		setSystemPlanets((oldSystem) => {
+			oldSystem[i] = newCelestialObject;
+			return oldSystem;
+		});
+	};
+	const handleChange = (i) => {
+		setExpanded(i);
+		i >= 0 ? setPaused(true) : setPaused(false);
+	};
+	return (
+		<>
+			<Box sx={{ display: "flex", justifyContent: "space-between" }}>
+				<p>{name}</p>
+				<p>Add</p>
+			</Box>
+			{objects.map((celestialObject, i) => (
+				<CelestialObjectInput
+					key={i}
+					celestialObject={celestialObject}
+					expanded={expanded === i}
+					handleChange={() => handleChange(i)}
+					setCelestialObject={(newCelestialObject) =>
+						setCelestialObject(newCelestialObject, i)
+					}
+				/>
+			))}
+		</>
+	);
+};
+const CelestialObjectInput = ({
+	celestialObject,
+	expanded,
+	handleChange,
+	setCelestialObject,
+}) => {
+	const handleTextChange = ({ target: { name, value } }) => {
+		setCelestialObject((oldObject) => {
+			oldObject[name] = value;
+			return oldObject;
+		});
+	};
+	const handleNumberChange = ({ target: { name, value } }) => {
+		setCelestialObject((oldObject) => {
+			oldObject[name] = +value;
+			return oldObject;
+		});
+	};
+	return (
+		<Accordion expanded={expanded} onChange={handleChange}>
+			<AccordionSummary
+				expandIcon={<ExpandMoreIcon />}
+				aria-controls="panel1bh-content"
+				id="panel1bh-header"
+			>
+				<Typography>{celestialObject.name}</Typography>
+			</AccordionSummary>
+			<AccordionDetails>
+				<TextField
+					id={`${celestialObject.name}-name`}
+					label={"Name"}
+					name={"name"}
+					variant="filled"
+					value={celestialObject.name}
+					onChange={handleTextChange}
+				/>
+				<TextField
+					id={`${celestialObject.name}-radius`}
+					label={"Radius"}
+					name={"radius"}
+					variant="filled"
+					value={celestialObject.radius}
+					onChange={handleNumberChange}
+				/>
+				<TextField
+					id={`${celestialObject.name}-distanceX`}
+					label={"DistanceX"}
+					name={"distanceX"}
+					variant="filled"
+					value={celestialObject.distanceX}
+					onChange={handleNumberChange}
+				/>
+				<TextField
+					id={`${celestialObject.name}-distanceY`}
+					label={"DistanceY"}
+					name={"distanceY"}
+					variant="filled"
+					value={celestialObject.distanceY}
+					onChange={handleNumberChange}
+				/>
+				<TextField
+					id={`${celestialObject.name}-color`}
+					label={"Color"}
+					name={"color"}
+					variant="filled"
+					value={celestialObject.color}
+					onChange={handleTextChange}
+				/>
+				<TextField
+					id={`${celestialObject.name}-rotations`}
+					label={"Rotations"}
+					name={"rotations"}
+					variant="filled"
+					value={celestialObject.rotations}
+					onChange={handleNumberChange}
+				/>
+				<TextField
+					id={`${celestialObject.name}-offset`}
+					label={"Offset"}
+					name={"offSet"}
+					variant="filled"
+					value={celestialObject.offSet}
+					onChange={handleNumberChange}
+				/>
+			</AccordionDetails>
+		</Accordion>
+	);
+};
+
 const CircularBoundary = ({
 	circleBoundary: { strokeColor, strokeWidth, radiusX, radiusY },
 	centeringX,
@@ -392,11 +519,11 @@ const CircularBoundary = ({
 
 export default function App() {
 	const [tick, setTick] = useState(0);
+	const [paused, setPaused] = useState(false);
 	const [zoom, setZoom] = useState(50);
 	const [scale, setScale] = useState(7);
 
 	const [daysPerSecond, setDaysPerSecond] = useState(50);
-	const [paused, setPaused] = useState(false);
 	const [showOrbit, setShowOrbit] = useState(true);
 	const [showBoundaries, setShowBoundaries] = useState(true);
 
@@ -407,7 +534,6 @@ export default function App() {
 	const [systemBoundaries, setSystemBoundaries] = useState(
 		dwarfSystem.boundaries
 	);
-	const [expanded, setExpanded] = useState();
 
 	const handleCheckClick = (setFunc) => setFunc((x) => !x);
 	// const handleScroll = (e) => {
@@ -426,9 +552,6 @@ export default function App() {
 	// 		window.removeEventListener("scroll", handleScroll);
 	// 	};
 	// }, []);
-	const handleAccordion = (panel) => (event, isExpanded) => {
-		setExpanded(isExpanded ? panel : false);
-	};
 
 	// tick animation
 	function tickAnimation() {
@@ -456,6 +579,11 @@ export default function App() {
 					>
 						<h1>Planets</h1>
 						<div>
+							<p>Tick: {tick}</p>
+							<p>Paused: {paused ? "True" : "False"}</p>
+						</div>
+						<hr />
+						<div>
 							<InputSlider
 								label={"Zoom"}
 								value={zoom}
@@ -474,10 +602,6 @@ export default function App() {
 								max={10}
 								defaultValue={7}
 							/>
-						</div>
-						<hr />
-						<div>
-							<p>Tick: {tick}</p>
 						</div>
 						<hr />
 						{/* <div>
@@ -520,114 +644,29 @@ export default function App() {
 						</div>
 						<hr />
 						<div>
-							{[
-								{ name: "Suns", objects: systemSuns },
-								{ name: "Planets", objects: systemPlanets },
-							].map(({ name, objects }) => (
+							<button onClick={() => handleCheckClick(setPaused)}>
+								{paused ? "Unpause" : "Pause"}
+							</button>
+							{paused && (
 								<>
-									<p>{name}</p>
-									{objects.map((celestialObject, i) => (
-										<Accordion
-											expanded={expanded === i}
-											onChange={handleAccordion(i)}
-										>
-											<AccordionSummary
-												expandIcon={<ExpandMoreIcon />}
-												aria-controls="panel1bh-content"
-												id="panel1bh-header"
-											>
-												<Typography>{celestialObject.name}</Typography>
-											</AccordionSummary>
-											<AccordionDetails>
-												<TextField
-													id={`${celestialObject.name}-name`}
-													label={"Name"}
-													variant="filled"
-													value={celestialObject.name}
-													onChange={({ target: { value } }) => {
-														setSystemPlanets((oldSystem) => {
-															oldSystem[i].name = +value;
-															return oldSystem;
-														});
-													}}
-												/>
-												<TextField
-													id={`${celestialObject.name}-radius`}
-													label={"Radius"}
-													variant="filled"
-													value={celestialObject.radius}
-													onChange={({ target: { value } }) => {
-														setSystemPlanets((oldSystem) => {
-															oldSystem[i].radius = +value;
-															return oldSystem;
-														});
-													}}
-												/>
-												<TextField
-													id={`${celestialObject.name}-distanceX`}
-													label={"DistanceX"}
-													variant="filled"
-													value={celestialObject.distanceX}
-													onChange={({ target: { value } }) => {
-														setSystemPlanets((oldSystem) => {
-															oldSystem[i].distanceX = +value;
-															return oldSystem;
-														});
-													}}
-												/>
-												<TextField
-													id={`${celestialObject.name}-distanceY`}
-													label={"DistanceY"}
-													variant="filled"
-													value={celestialObject.distanceY}
-													onChange={({ target: { value } }) => {
-														setSystemPlanets((oldSystem) => {
-															oldSystem[i].distanceY = +value;
-															return oldSystem;
-														});
-													}}
-												/>
-												<TextField
-													id={`${celestialObject.name}-color`}
-													label={"Color"}
-													variant="filled"
-													value={celestialObject.color}
-													onChange={({ target: { value } }) =>
-														setSystemPlanets((oldSystem) => {
-															oldSystem[i].color = value;
-															return oldSystem;
-														})
-													}
-												/>
-												<TextField
-													id={`${celestialObject.name}-rotations`}
-													label={"Rotations"}
-													variant="filled"
-													value={celestialObject.rotations}
-													onChange={({ target: { value } }) => {
-														setSystemPlanets((oldSystem) => {
-															oldSystem[i].rotations = +value;
-															return oldSystem;
-														});
-													}}
-												/>
-												<TextField
-													id={`${celestialObject.name}-offset`}
-													label={"Offset"}
-													variant="filled"
-													value={celestialObject.offSet}
-													onChange={({ target: { value } }) =>
-														setSystemPlanets((oldSystem) => {
-															oldSystem[i].offSet = value;
-															return oldSystem;
-														})
-													}
-												/>
-											</AccordionDetails>
-										</Accordion>
-									))}
+									<div>
+										<CelestialObjectInputs
+											name={"Suns"}
+											objects={systemSuns}
+											setSystemPlanets={setSystemSuns}
+											setPaused={setPaused}
+										/>
+									</div>
+									<div>
+										<CelestialObjectInputs
+											name={"Planets"}
+											objects={systemPlanets}
+											setSystemPlanets={setSystemPlanets}
+											setPaused={setPaused}
+										/>
+									</div>
 								</>
-							))}
+							)}
 						</div>
 					</div>
 				</Grid>
@@ -635,27 +674,38 @@ export default function App() {
 					<div style={{ height: _height * 2, position: "relative" }}>
 						<div style={{ position: "fixed" }}>
 							<svg width={_width} height={_height}>
-								{[
-									{ name: "Suns", objects: systemSuns },
-									{ name: "Planets", objects: systemPlanets },
-								].map(({ name, objects }) =>
-									objects.map((celestialObject, i) => {
-										return (
-											<CelestialObject
-												key={i}
-												celestialObject={celestialObject}
-												centeringX={_midX}
-												centeringY={_midY}
-												daysPerSecond={daysPerSecond}
-												paused={paused}
-												showOrbit={showOrbit}
-												zoom={zoom}
-												scale={scale}
-												tick={tick}
-											/>
-										);
-									})
-								)}
+								{systemSuns.map((celestialObject, i) => {
+									return (
+										<CelestialObject
+											key={i}
+											celestialObject={celestialObject}
+											centeringX={_midX}
+											centeringY={_midY}
+											daysPerSecond={daysPerSecond}
+											paused={paused}
+											showOrbit={showOrbit}
+											zoom={zoom}
+											scale={scale}
+											tick={tick}
+										/>
+									);
+								})}
+								{systemPlanets.map((celestialObject, i) => {
+									return (
+										<CelestialObject
+											key={i}
+											celestialObject={celestialObject}
+											centeringX={_midX}
+											centeringY={_midY}
+											daysPerSecond={daysPerSecond}
+											paused={paused}
+											showOrbit={showOrbit}
+											zoom={zoom}
+											scale={scale}
+											tick={tick}
+										/>
+									);
+								})}
 								{showBoundaries &&
 									systemBoundaries.circles.length > 0 &&
 									systemBoundaries.circles.map((cir, i) => (
