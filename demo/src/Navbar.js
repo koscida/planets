@@ -9,6 +9,9 @@ const Navbar = () => {
 					<NavLink to="/planets" activeStyle>
 						Planets
 					</NavLink>
+					<NavLink to="/ball" activeStyle>
+						Ball
+					</NavLink>
 					<NavLink to="/spiral" activeStyle>
 						Spiral
 					</NavLink>
