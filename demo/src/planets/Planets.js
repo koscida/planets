@@ -553,17 +553,30 @@ export default function App() {
 	// 	};
 	// }, []);
 
-	// tick animation
-	function tickAnimation() {
-		if (!paused) setTick((tick) => (tick += 1));
-	}
+	// // tick animation
+	// function tickAnimation() {
+	// 	if (!paused) setTick((tick) => (tick += 1));
+	// }
 
-	// start game loop timer on mount
-	useEffect(() => {
-		//const t = d3.timer(tickAnimation);
-		const t = d3.interval(tickAnimation, 1000 * (1 / 25));
-		return () => t.stop();
-	}, []);
+	// // start game loop timer on mount
+	// useEffect(() => {
+	// 	//const t = d3.timer(tickAnimation);
+	// 	const t = d3.interval(tickAnimation, 1000 * (1 / 25));
+	// 	return () => t.stop();
+	// }, []);
+
+	let start = Date.now();
+
+	let football = document.querySelector(".circle");
+
+	let timer = requestAnimationFrame(function tickTimer(timestamp) {
+		let interval = Date.now() - start;
+
+		if (!paused) {
+			setTick((tick) => (tick += 1));
+			if (interval < 1000) requestAnimationFrame(tickTimer); // queue request for next frame
+		}
+	});
 
 	return (
 		<div className="App">
