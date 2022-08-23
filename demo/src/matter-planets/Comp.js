@@ -94,8 +94,12 @@ export default function MatterStepThree() {
 			engine: engine,
 			canvas: canvasRef.current,
 			options: {
+				width: constraints.width,
+				height: constraints.height,
 				background: "transparent",
+				hasBounds: true,
 				wireframes: false,
+				showBounds: true,
 			},
 		});
 

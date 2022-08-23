@@ -13,7 +13,6 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import InputSlider from "./components/InputSlider";
-import "./main.css";
 
 const dwarfSystem = {
 	solarObjects: [
