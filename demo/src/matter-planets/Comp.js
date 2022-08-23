@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import Matter from "matter-js";
 import Sketch from "react-p5";
+import MatterAttractors from "matter-attractors";
+Matter.use(MatterAttractors);
 
 const STATIC_DENSITY = 15;
 const PARTICLE_SIZE = 15;
@@ -16,27 +18,62 @@ export default function MatterStepThree() {
 	});
 	const [scene, setScene] = useState();
 
-	const [someStateValue, setSomeStateValue] = useState(false);
+	const [addStateValue, setAddStateValue] = useState(false);
+	const [deleteStateValue, setDeleteStateValue] = useState(false);
 
-	const handleClick = () => {
-		setSomeStateValue(!someStateValue);
+	// handle click - add
+	const handleAddClick = () => {
+		setAddStateValue(!addStateValue);
 	};
 	useEffect(() => {
 		// Add a new "ball" everytime `someStateValue` changes
 		if (scene) {
-			let { width } = constraints;
+			let { width, height } = constraints;
 			[...Array(10).keys()].forEach(() => {
 				let randomX = Math.floor(Math.random() * -width) + width;
+				let randomY = Math.floor(Math.random() * -height) + height;
 				Matter.World.add(
 					scene.engine.world,
-					Matter.Bodies.circle(randomX, -PARTICLE_SIZE, PARTICLE_SIZE, {
+					Matter.Bodies.circle(randomX, randomY, PARTICLE_SIZE, {
 						restitution: PARTICLE_BOUNCYNESS,
+						plugin: {
+							attractors: [
+								function (bodyA, bodyB) {
+									var force = {
+										x: (bodyA.position.x - bodyB.position.x) * 1e-7,
+										y: (bodyA.position.y - bodyB.position.y) * 1e-7,
+									};
+
+									// apply force to both bodies
+									Matter.Body.applyForce(
+										bodyA,
+										bodyA.position,
+										Matter.Vector.neg(force)
+									);
+									Matter.Body.applyForce(bodyB, bodyB.position, force);
+								},
+							],
+						},
 					})
 				);
 			});
 		}
-	}, [someStateValue]);
+	}, [addStateValue]);
 
+	// handle click - delete
+	const handleDeleteClick = () => {
+		setDeleteStateValue(!deleteStateValue);
+	};
+	useEffect(() => {
+		if (scene) {
+			Matter.World.remove(
+				scene.engine.world,
+				scene.engine.world.bodies[scene.engine.world.bodies.length - 1]
+			);
+		}
+	}, [deleteStateValue]);
+
+	// handle window resize
 	const handleResize = () => {
 		setContraints(boxRef.current.getBoundingClientRect());
 		console.log("handleResize", constraints);
@@ -77,6 +114,7 @@ export default function MatterStepThree() {
 		}
 	}, [scene, constraints]);
 
+	// setup
 	useEffect(() => {
 		let Engine = Matter.Engine,
 			Render = Matter.Render,
@@ -87,6 +125,8 @@ export default function MatterStepThree() {
 
 		// create an engine
 		let engine = Engine.create({});
+
+		engine.gravity.y = 0;
 
 		// create a renderer
 		let render = Render.create({
@@ -166,9 +206,19 @@ export default function MatterStepThree() {
 					display: "block",
 					textAlign: "center",
 				}}
-				onClick={() => handleClick()}
+				onClick={() => handleAddClick()}
 			>
 				Add
+			</button>
+			<button
+				style={{
+					cursor: "pointer",
+					display: "block",
+					textAlign: "center",
+				}}
+				onClick={() => handleDeleteClick()}
+			>
+				Delete
 			</button>
 			<div
 				ref={boxRef}
