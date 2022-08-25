@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Nav, NavLink, NavMenu } from "./NavbarElements";
 import Planets from "./svg-planets/Planets";
 import MatterPlanets from "./matter-planets/Comp";
+import P5Planets from "./p5-planets/Planets";
 import P5Example from "./p5-example/Comp";
 import Matter from "./matter/Comp";
 import Ball from "./ball-animation-frame/BounceBall";
@@ -17,6 +18,9 @@ const Home = () => {
 			</NavLink>
 			<NavLink to="/p5-example" activeStyle>
 				P5 example
+			</NavLink>
+			<NavLink to="/p5-planets" activeStyle>
+				P5 Planets
 			</NavLink>
 			<NavLink to="/matter-planets" activeStyle>
 				Matter Planets - Planets using matter.js
@@ -45,6 +49,7 @@ function App() {
 				<Route path="/" index element={<Home />} />
 				<Route path="/planets" element={<Planets />} />
 				<Route path="/p5-example" element={<P5Example />} />
+				<Route path="/p5-planets" element={<P5Planets />} />
 				<Route path="/matter-planets" element={<MatterPlanets />} />
 				<Route path="/matter" element={<Matter />} />
 				<Route path="/ball" element={<Ball />} />
